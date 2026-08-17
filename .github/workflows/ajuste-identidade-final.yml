@@ -1,0 +1,75 @@
+name: Ajuste final identidade visual
+
+on:
+  push:
+    paths:
+      - '.github/workflows/ajuste-identidade-final.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Aplicar cores finais
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          html = p.read_text(encoding='utf-8')
+          css = r'''
+<style id="identidade-unica-final">
+/* Roxo: degradê do roxo mais forte para um roxo médio/fraco */
+.btn-primary,
+.hero-actions .btn-primary,
+a.btn-primary {
+  background: linear-gradient(135deg, #4B168F 0%, #6526B8 55%, #8B45D1 100%) !important;
+  color: #FFFFFF !important;
+  border: 0 !important;
+  box-shadow: 0 10px 28px rgba(75,22,143,.30) !important;
+}
+.btn-primary:hover,
+.hero-actions .btn-primary:hover,
+a.btn-primary:hover {
+  background: linear-gradient(135deg, #4B168F 0%, #6526B8 55%, #8B45D1 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* Amarelo institucional: texto roxo forte */
+.btn-accent,
+.hero-actions .btn-accent,
+a.btn-accent {
+  background: linear-gradient(135deg, #F6A122 0%, #FFB12B 55%, #FFC04A 100%) !important;
+  color: #4B168F !important;
+  border: 0 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 26px rgba(246,161,34,.25) !important;
+}
+.btn-accent:hover,
+.hero-actions .btn-accent:hover,
+a.btn-accent:hover {
+  background: linear-gradient(135deg, #F6A122 0%, #FFB12B 55%, #FFC04A 100%) !important;
+  color: #4B168F !important;
+}
+
+/* WhatsApp: botão roxo, símbolo verde */
+.floating-wa {
+  background: linear-gradient(135deg, #4B168F 0%, #6526B8 55%, #8B45D1 100%) !important;
+  color: #25D366 !important;
+}
+.floating-wa svg { stroke: #25D366 !important; }
+.floating-wa svg path { stroke: #25D366 !important; }
+</style>
+'''
+          html = html.replace('</head>', css + '\n</head>', 1)
+          p.write_text(html, encoding='utf-8')
+      - name: Commit e remover workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git rm .github/workflows/ajuste-identidade-final.yml
+          git commit -m 'Ajusta cores finais da identidade visual' || exit 0
+          git push
