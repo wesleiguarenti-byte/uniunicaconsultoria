@@ -1,0 +1,39 @@
+name: Ajustar botões para amarelo
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  ajustar-botoes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o site
+        uses: actions/checkout@v4
+
+      - name: Alterar botões roxos para o padrão amarelo
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          html = path.read_text(encoding='utf-8')
+
+          marker = '/* BOTÕES AMARELOS PADRÃO UNIÚNICA */'
+          if marker not in html:
+              css = '''\n/* BOTÕES AMARELOS PADRÃO UNIÚNICA */\n.btn-primary,\n.btn-primary:hover {\n  background: linear-gradient(135deg,#f6a122 0%,#ffb52e 55%,#f8ad38 100%) !important;\n  color: #391466 !important;\n  box-shadow: 0 10px 26px rgba(246,161,34,.28) !important;\n}\n.btn-primary:hover {\n  background: linear-gradient(135deg,#e39112 0%,#f6a122 55%,#f8ad38 100%) !important;\n  transform: translateY(-2px);\n  box-shadow: 0 14px 30px rgba(246,161,34,.34) !important;\n}\n'''
+              html = html.replace('</style>', css + '</style>', 1)
+              path.write_text(html, encoding='utf-8')
+          PY
+
+      - name: Salvar alteração no GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Deixa os botões roxos no padrão amarelo"
+          git push
