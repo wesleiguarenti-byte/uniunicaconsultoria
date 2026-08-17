@@ -1,0 +1,48 @@
+name: Apply UniÚnica branding
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-branding.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  branding:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply visual identity
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          html = path.read_text(encoding='utf-8')
+
+          replacements = {
+              r'\.btn-primary\{[^}]*\}\.btn-primary:hover\{[^}]*\}': '.btn-primary{background:linear-gradient(135deg,#4b168f 0%,#7b2fd0 55%,#9b55e6 100%);color:#fff;box-shadow:0 10px 28px rgba(101,38,184,.30);border:0}.btn-primary:hover{background:linear-gradient(135deg,#3d176f 0%,#6526b8 55%,#8d43d7 100%);transform:translateY(-2px);box-shadow:0 14px 32px rgba(101,38,184,.36)}',
+              r'\.btn-accent\{[^}]*\}\.btn-accent:hover\{[^}]*\}': '.btn-accent{background:linear-gradient(135deg,#f6a122 0%,#ffb52e 100%);color:#fff;box-shadow:0 10px 26px rgba(246,161,34,.28)}.btn-accent:hover{background:linear-gradient(135deg,#d9860e 0%,#f6a122 100%);transform:translateY(-2px);box-shadow:0 14px 30px rgba(246,161,34,.34)}',
+              r'\.floating-wa\{[^}]*\}': '.floating-wa{position:fixed;right:18px;bottom:18px;z-index:50;background:linear-gradient(135deg,#4b168f 0%,#7b2fd0 100%);color:#fff;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(101,38,184,.34);transition:.2s}.floating-wa:hover{transform:translateY(-3px);background:linear-gradient(135deg,#3d176f 0%,#6526b8 100%)}',
+          }
+
+          for pattern, replacement in replacements.items():
+              html, count = re.subn(pattern, replacement, html, count=1)
+              if count != 1:
+                  raise SystemExit(f'Expected CSS rule not found: {pattern}')
+
+          html = html.replace('.hero-actions .btn{width:100%}', '.hero-actions .btn{width:100%}')
+          path.write_text(html, encoding='utf-8')
+
+      - name: Commit changes and remove one-time workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git rm .github/workflows/apply-branding.yml
+          git commit -m 'Ajusta identidade visual do site UniÚnica' || exit 0
+          git push
