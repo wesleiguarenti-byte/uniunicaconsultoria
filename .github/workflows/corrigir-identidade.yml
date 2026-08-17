@@ -1,0 +1,62 @@
+name: Corrigir identidade visual
+
+on:
+  push:
+    paths:
+      - '.github/workflows/corrigir-identidade.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  corrigir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Corrigir cores no index.html
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          old_primary = "background:linear-gradient(135deg,#4b168f 0%,#7b2fd0 55%,#9b55e6 100%);color:#fff;box-shadow:0 10px 28px rgba(101,38,184,.30);border:0"
+          new_primary = "background:linear-gradient(135deg,#3d176f 0%,#6526b8 55%,#7b2fd0 100%);color:#fff;box-shadow:0 10px 28px rgba(61,23,111,.30);border:0"
+          s = s.replace(old_primary, new_primary)
+
+          old_primary_hover = "background:linear-gradient(135deg,#3d176f 0%,#6526b8 55%,#8d43d7 100%);transform:translateY(-2px);box-shadow:0 14px 32px rgba(101,38,184,.36)"
+          new_primary_hover = "background:linear-gradient(135deg,#32105c 0%,#54209c 55%,#6f28bd 100%);transform:translateY(-2px);box-shadow:0 14px 32px rgba(61,23,111,.36)"
+          s = s.replace(old_primary_hover, new_primary_hover)
+
+          old_accent = "background:linear-gradient(135deg,#f6a122 0%,#ffb52e 100%);color:#fff;box-shadow:0 10px 26px rgba(246,161,34,.28)"
+          new_accent = "background:linear-gradient(135deg,#f6a122 0%,#ffb52e 55%,#f8ad38 100%);color:#4b168f;box-shadow:0 10px 26px rgba(246,161,34,.28)"
+          s = s.replace(old_accent, new_accent)
+
+          old_accent_hover = "background:linear-gradient(135deg,#d9860e 0%,#f6a122 100%);transform:translateY(-2px);box-shadow:0 14px 30px rgba(246,161,34,.34)"
+          new_accent_hover = "background:linear-gradient(135deg,#e39112 0%,#f6a122 55%,#f8ad38 100%);color:#4b168f;transform:translateY(-2px);box-shadow:0 14px 30px rgba(246,161,34,.34)"
+          s = s.replace(old_accent_hover, new_accent_hover)
+
+          old_wa = "background:linear-gradient(135deg,#4b168f 0%,#7b2fd0 100%);color:#fff;width:58px;height:58px"
+          new_wa = "background:linear-gradient(135deg,#3d176f 0%,#6526b8 55%,#7b2fd0 100%);color:#25D366;width:58px;height:58px"
+          s = s.replace(old_wa, new_wa)
+
+          old_wa_hover = "background:linear-gradient(135deg,#3d176f 0%,#6526b8 100%)"
+          new_wa_hover = "background:linear-gradient(135deg,#32105c 0%,#54209c 55%,#6f28bd 100%)"
+          s = s.replace(old_wa_hover, new_wa_hover)
+
+          s = s.replace(".floating-wa svg{width:28px", ".floating-wa svg{color:#25D366;stroke:#25D366;width:28px")
+          s = s.replace(".floating-wa:hover{transform:translateY(-3px);background:var(--yellow-dark)}", ".floating-wa:hover{transform:translateY(-3px)}")
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commitar e remover workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git rm .github/workflows/corrigir-identidade.yml
+          git diff --cached --quiet && exit 0
+          git commit -m 'Ajusta degradê, texto amarelo e WhatsApp'
+          git push
