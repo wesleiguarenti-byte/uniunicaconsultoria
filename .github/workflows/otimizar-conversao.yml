@@ -1,0 +1,82 @@
+name: Otimizar conversao do site
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - '.github/workflows/otimizar-conversao.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  otimizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      - name: Aplicar melhorias de conversao e SEO
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          html = p.read_text(encoding='utf-8')
+
+          if '<!-- OTIMIZACAO-CONVERSAO-2026 -->' in html:
+              print('Otimização já aplicada.')
+              raise SystemExit(0)
+
+          # Metadados de busca e compartilhamento. Não altera CSS, cores ou logos.
+          meta = '''\n<!-- OTIMIZACAO-CONVERSAO-2026 -->\n<meta name="robots" content="index,follow">\n<meta name="theme-color" content="#391466">\n<meta property="og:type" content="website">\n<meta property="og:title" content="Graduação e Segunda Graduação | UniÚnica">\n<meta property="og:description" content="Conheça opções de graduação e segunda graduação e fale com um consultor educacional.">\n<meta property="og:url" content="https://wesleiguarenti-byte.github.io/uniunicaconsultoria/">\n<link rel="canonical" href="https://wesleiguarenti-byte.github.io/uniunicaconsultoria/">\n'''
+          html = html.replace('</head>', meta + '</head>', 1)
+
+          # Hero: deixa a proposta comercial mais clara, sem trocar a estrutura visual.
+          html = html.replace(
+              'Seu próximo passo começa com uma escolha: Centro Universitário UniÚnica.',
+              'Encontre a graduação que combina com o seu próximo passo.'
+          )
+          html = html.replace(
+              'Conheça as opções de graduação do Centro Universitário UniÚnica e encontre uma formação alinhada aos seus objetivos. Nossa equipe de atendimento está pronta para apresentar cursos, condições e próximos passos.',
+              'Conheça opções de graduação e segunda graduação, compare possibilidades e fale com um consultor educacional para entender o próximo passo.'
+          )
+
+          # Bloco de segunda graduação antes da área de cursos.
+          bloco = '''\n<section class="highlight" id="segunda-graduacao">\n  <div class="container">\n    <div class="section-title">\n      <h2>Já possui uma graduação?</h2>\n      <p>Sua primeira graduação não precisa ser a última. Conheça possibilidades de segunda graduação e receba orientação sobre as opções disponíveis.</p>\n    </div>\n    <div class="cards">\n      <article class="card">\n        <h3>🔄 Segunda graduação</h3>\n        <p>Veja possibilidades para ampliar sua formação e abrir novas oportunidades profissionais.</p>\n      </article>\n      <article class="card">\n        <h3>📚 Escolha sua área</h3>\n        <p>Informe sua formação atual e o objetivo que deseja alcançar. O consultor orienta você sobre as opções disponíveis.</p>\n      </article>\n      <article class="card">\n        <h3>💬 Atendimento personalizado</h3>\n        <p>Converse diretamente com um consultor para tirar dúvidas sobre curso, condições e próximos passos.</p>\n      </article>\n    </div>\n    <div style="text-align:center;margin-top:28px">\n      <a class="btn btn-accent" href="https://wa.me/5531995528859?text=Ol%C3%A1!%20Acessei%20o%20site%20e%20quero%20saber%20sobre%20segunda%20gradua%C3%A7%C3%A3o.%20Minha%20gradua%C3%A7%C3%A3o%20atual%20%C3%A9%3A">Quero saber minhas opções</a>\n    </div>\n  </div>\n</section>\n'''
+          marker = '<section'
+          target = 'Encontre sua graduação'
+          if target in html:
+              pos = html.find(target)
+              section_start = html.rfind('<section', 0, pos)
+              if section_start >= 0:
+                  html = html[:section_start] + bloco + html[section_start:]
+
+          # CTA específico de orientação, inserido antes do FAQ.
+          cta = '''\n<section id="orientacao">\n  <div class="container">\n    <div class="cta">\n      <h2>Não sabe qual graduação escolher?</h2>\n      <p>Conte ao consultor qual é sua formação atual, seu objetivo e a área de interesse. Você recebe orientação para conhecer as opções disponíveis.</p>\n      <a class="btn btn-accent" href="https://wa.me/5531995528859?text=Ol%C3%A1!%20Acessei%20o%20site%20e%20quero%20uma%20orienta%C3%A7%C3%A3o%20sobre%20gradua%C3%A7%C3%A3o.%20Gostaria%20de%20saber%20quais%20op%C3%A7%C3%B5es%20est%C3%A3o%20dispon%C3%ADveis.">Falar com um consultor</a>\n    </div>\n  </div>\n</section>\n'''
+          if '## Perguntas frequentes' not in html and 'Perguntas frequentes' in html:
+              pos = html.find('Perguntas frequentes')
+              section_start = html.rfind('<section', 0, pos)
+              if section_start >= 0:
+                  html = html[:section_start] + cta + html[section_start:]
+
+          # Dados estruturados básicos para ajudar buscadores a entenderem a página.
+          schema = '''\n<script type="application/ld+json">\n{\n  "@context":"https://schema.org",\n  "@type":"EducationalOrganization",\n  "name":"Centro Universitário UniÚnica",\n  "url":"https://wesleiguarenti-byte.github.io/uniunicaconsultoria/",\n  "description":"Página de divulgação e atendimento educacional para apresentação de opções de graduação e orientação comercial."\n}\n</script>\n'''
+          html = html.replace('</head>', schema + '</head>', 1)
+
+          p.write_text(html, encoding='utf-8')
+          print('Otimização aplicada sem alteração de CSS ou imagens/logo.')
+          PY
+
+      - name: Publicar alteracoes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração para publicar."
+          else
+            git commit -m "Melhora conversao e SEO sem alterar identidade visual"
+            git push
+          fi
