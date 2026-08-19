@@ -1,0 +1,95 @@
+name: Melhorias comerciais do site
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  melhorar-site:
+    if: "!contains(github.event.head_commit.message, '[site-auto]')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Acrescentar melhorias sem alterar identidade visual
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          html = p.read_text(encoding='utf-8')
+
+          marker = '<!-- MELHORIAS COMERCIAIS UNIÚNICA -->'
+          if marker in html:
+              print('Melhorias já aplicadas.')
+              raise SystemExit(0)
+
+          css = r'''<style id="melhorias-comerciais">
+          .lead-second-degree{background:#fff;border:1px solid var(--border);border-radius:22px;padding:34px;box-shadow:0 12px 35px rgba(38,16,46,.08);margin-top:28px}
+          .lead-second-degree h3{font-size:27px;color:var(--dark);margin-bottom:8px}
+          .lead-second-degree p{color:var(--muted);max-width:760px;margin-bottom:20px}
+          .lead-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+          .lead-item{padding:17px;border-radius:14px;background:var(--light);border:1px solid var(--border);font-size:13px;font-weight:700}
+          .lead-item strong{display:block;color:var(--purple);font-size:15px;margin-bottom:3px}
+          .lead-actions{display:flex;gap:12px;flex-wrap:wrap}
+          .course-intent{margin-top:24px;background:var(--purple-soft);border-radius:18px;padding:25px;text-align:center}
+          .course-intent h3{color:var(--dark);margin-bottom:7px}
+          .course-intent p{color:var(--muted);font-size:14px;margin-bottom:16px}
+          @media(max-width:700px){.lead-grid{grid-template-columns:1fr}.lead-second-degree{padding:24px}.lead-actions .btn{width:100%}}
+          </style>'''
+
+          section = r'''<!-- MELHORIAS COMERCIAIS UNIÚNICA -->
+          <section class="lead-second-degree" id="segunda-graduacao">
+            <div class="container">
+              <h3>Já possui uma graduação?</h3>
+              <p>Descubra possibilidades para sua próxima graduação. Nossa equipe pode orientar você sobre cursos, condições e próximos passos conforme o seu objetivo.</p>
+              <div class="lead-grid">
+                <div class="lead-item"><strong>Segunda graduação</strong>Encontre novas possibilidades profissionais.</div>
+                <div class="lead-item"><strong>Orientação personalizada</strong>Converse com um consultor educacional.</div>
+                <div class="lead-item"><strong>Escolha com segurança</strong>Confirme curso, modalidade e condições da oferta.</div>
+              </div>
+              <div class="lead-actions">
+                <a class="btn btn-primary" href="https://wa.me/5531995528859?text=Ol%C3%A1!%20Acessei%20o%20site%20e%20quero%20saber%20quais%20op%C3%A7%C3%B5es%20de%20segunda%20gradua%C3%A7%C3%A3o%20est%C3%A3o%20dispon%C3%ADveis%20para%20mim." target="_blank" rel="noopener">Quero conhecer minhas opções</a>
+                <a class="btn btn-outline" href="#contato">Prefiro preencher meus dados</a>
+              </div>
+            </div>
+          </section>
+          <div class="course-intent container">
+            <h3>Não sabe qual graduação combina com você?</h3>
+            <p>Informe sua formação ou área de interesse e receba orientação de um consultor educacional.</p>
+            <a class="btn btn-accent" href="https://wa.me/5531995528859?text=Ol%C3%A1!%20Acessei%20o%20site%20e%20quero%20ajuda%20para%20escolher%20uma%20gradua%C3%A7%C3%A3o." target="_blank" rel="noopener">Quero orientação sobre o curso</a>
+          </div>'''
+
+          # Insere somente novos elementos antes do FAQ, preservando o HTML e a identidade existentes.
+          faq_pos = html.find('Perguntas frequentes')
+          if faq_pos >= 0:
+              section_start = html.rfind('<section', 0, faq_pos)
+              if section_start >= 0:
+                  html = html[:section_start] + section + html[section_start:]
+              else:
+                  html = html.replace('</body>', section + '</body>', 1)
+          else:
+              html = html.replace('</body>', section + '</body>', 1)
+
+          html = html.replace('</head>', css + '\n</head>', 1)
+
+          # Melhora SEO sem alterar visual, cores ou logos.
+          seo = '''<meta name="robots" content="index,follow"><meta name="theme-color" content="#391466"><meta property="og:title" content="Graduação e segunda graduação | UniÚnica"><meta property="og:description" content="Conheça opções de graduação e receba orientação de um consultor educacional.">'''
+          html = html.replace('</head>', seo + '\n</head>', 1)
+
+          p.write_text(html, encoding='utf-8')
+          print('Melhorias comerciais inseridas. Identidade visual preservada.')
+
+      - name: Publicar alteração
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Atualiza conversão e SEO [site-auto]"
+          git push
