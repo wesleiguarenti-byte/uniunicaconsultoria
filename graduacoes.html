@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graduações | UniÚnica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--purple-dark:#391466;--purple:#6424B3;--purple-light:#8733FF;--yellow:#F6A122;--white:#fff;--gray:#F2F2F2;--text:#24152f;--muted:#756d7d;--border:#e8dff1}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Poppins,Arial,sans-serif;background:#fff;color:var(--text)}
+.container{width:min(1050px,92%);margin:auto}.page{padding:85px 0 100px;background:linear-gradient(180deg,#fff 0%,#faf8fd 100%)}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--purple);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:13px}.eyebrow i{width:8px;height:8px;background:var(--yellow);border-radius:50%}
+h1{font-size:clamp(34px,5vw,54px);line-height:1.1;letter-spacing:-1.5px;color:var(--purple-dark);margin:0 0 12px;text-align:center}.intro{max-width:680px;margin:0 auto 42px;text-align:center;color:var(--muted);font-size:15px}
+.accordion{max-width:850px;margin:auto}.item{background:var(--white);border:1px solid var(--border);border-radius:15px;margin:12px 0;overflow:hidden;box-shadow:0 8px 25px rgba(57,20,102,.06);transition:.25s}.item.open{border-color:var(--purple);box-shadow:0 14px 35px rgba(57,20,102,.12)}
+.trigger{width:100%;border:0;background:#fff;color:var(--purple-dark);display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 25px;cursor:pointer;text-align:left;font-size:17px;font-weight:800}.item.open .trigger{background:var(--purple-dark);color:#fff}.left{display:flex;align-items:center;gap:14px}.mark{width:35px;height:35px;border-radius:10px;display:grid;place-items:center;background:var(--gray);color:var(--purple);font-size:19px;font-weight:500}.item.open .mark{background:var(--yellow);color:var(--purple-dark)}.chevron{font-size:22px;transition:.25s;color:var(--purple)}.item.open .chevron{transform:rotate(180deg);color:var(--yellow)}
+.content{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}.item.open .content{grid-template-rows:1fr}.inner{overflow:hidden}.courses{padding:0 25px 18px;background:#fff}.course{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:16px 15px;border-bottom:1px solid #eee;color:var(--text);font-size:14px;font-weight:600}.course:nth-child(even){background:var(--gray)}.course:last-child{border-bottom:0}.course span:last-child{color:var(--purple);font-size:18px}.item.open .courses{padding-top:8px}
+.note{max-width:850px;margin:26px auto 0;padding:17px 20px;border-left:4px solid var(--yellow);background:#fff;border-radius:10px;color:var(--muted);font-size:12px}.back{text-align:center;margin-top:30px}.back a{display:inline-flex;padding:12px 20px;border-radius:10px;background:var(--yellow);color:var(--purple-dark);font-weight:800;text-decoration:none}
+@media(max-width:600px){.page{padding:55px 0 70px}.trigger{padding:18px}.courses{padding-left:12px;padding-right:12px}.course{padding:14px 10px;font-size:13px}}
+</style>
+</head>
+<body>
+<main class="page"><div class="container">
+<div style="text-align:center"><div class="eyebrow"><i></i>Graduações UniÚnica</div><h1>Encontre a graduação ideal para você</h1><p class="intro">Escolha uma modalidade para visualizar os cursos disponíveis. Clique novamente para fechar a lista.</p></div>
+<div class="accordion" id="accordion">
+<div class="item"><button class="trigger" type="button"><span class="left"><span class="mark">+</span><span>Tecnólogos</span></span><span class="chevron">⌄</span></button><div class="content"><div class="inner"><div class="courses"><div class="course">Gestão de Recursos Humanos <span>›</span></div><div class="course">Gestão Comercial <span>›</span></div><div class="course">Logística <span>›</span></div><div class="course">Marketing <span>›</span></div><div class="course">Análise e Desenvolvimento de Sistemas <span>›</span></div></div></div></div></div>
+<div class="item open"><button class="trigger" type="button"><span class="left"><span class="mark">−</span><span>Bacharelados</span></span><span class="chevron">⌄</span></button><div class="content"><div class="inner"><div class="courses"><div class="course">Administração <span>›</span></div><div class="course">Ciências Contábeis <span>›</span></div><div class="course">Direito <span>›</span></div><div class="course">Engenharia Civil <span>›</span></div><div class="course">Engenharia de Produção <span>›</span></div><div class="course">Psicologia <span>›</span></div></div></div></div></div>
+<div class="item"><button class="trigger" type="button"><span class="left"><span class="mark">+</span><span>Licenciaturas</span></span><span class="chevron">⌄</span></button><div class="content"><div class="inner"><div class="courses"><div class="course">Pedagogia <span>›</span></div><div class="course">História <span>›</span></div><div class="course">Letras <span>›</span></div><div class="course">Matemática <span>›</span></div><div class="course">Educação Física <span>›</span></div><div class="course">Educação Especial <span>›</span></div></div></div></div></div>
+</div>
+<div class="note">A lista acima é uma demonstração visual da organização por modalidade. A disponibilidade de cursos, modalidades, polos, vagas e condições deve ser confirmada para a oferta vigente.</div>
+<div class="back"><a href="index.html">← Voltar para o site</a></div>
+</div></main>
+<script>
+document.querySelectorAll('.trigger').forEach(btn=>btn.addEventListener('click',()=>{const item=btn.closest('.item');document.querySelectorAll('.item').forEach(other=>{if(other!==item){other.classList.remove('open');other.querySelector('.mark').textContent='+'}});item.classList.toggle('open');item.querySelector('.mark').textContent=item.classList.contains('open')?'−':'+';}));
+</script>
+</body>
+</html>
